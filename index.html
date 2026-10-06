@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="발주">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#ffffff">
+<title>발주 체크</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  color-scheme: light;
+  --bg: #ffffff;
+  --ink: #1f1d17;
+  --sub: #8a8574;
+  --line: #ece9de;
+  --paper: #faf9f4;
+  --yellow: #ffd84d;
+  --yellow-soft: #fff6cc;
+  --yellow-deep: #e0b000;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Noto Sans KR', system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+.wrap { max-width: 560px; margin: 0 auto; padding: 0 16px; }
+
+header.top {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 5;
+  background: var(--bg);
+  padding: 12px 0 6px;
+  border-bottom: 1px solid var(--line);
+}
+.store {
+  width: 100%;
+  border: none;
+  border-bottom: 3px solid var(--yellow);
+  background: transparent;
+  font: inherit;
+  font-size: 24px;
+  font-weight: 700;
+  padding: 6px 2px 8px;
+  color: var(--ink);
+  outline: none;
+  border-radius: 0;
+}
+.store::placeholder { color: #c4bfae; font-weight: 500; }
+.store:focus { border-bottom-color: var(--yellow-deep); }
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 10px 0 4px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 7px 16px;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.tab[aria-selected="true"] { background: var(--yellow); border-color: var(--yellow-deep); font-weight: 700; }
+.tab.plus { border-style: dashed; color: var(--sub); }
+.tab:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+.badge {
+  min-width: 20px; height: 20px; padding: 0 6px;
+  display: grid; place-items: center;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 12px; font-weight: 700; line-height: 1;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 14px;
+  color: var(--sub);
+}
+.link {
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink);
+  padding: 8px 4px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: var(--yellow-deep);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+main { padding-bottom: 130px; }
+
+.panel { display: flex; gap: 8px; padding: 12px 0 4px; }
+.panel[hidden] { display: none; }
+.panel input {
+  flex: 1; min-width: 0;
+  font: inherit; font-size: 16px;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  padding: 12px 14px;
+  outline: none;
+  background: #fff;
+}
+.panel input:focus { border-color: var(--ink); }
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 58px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.row.on { background: var(--yellow-soft); }
+.name {
+  flex: 1;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.35;
+  word-break: keep-all;
+}
+.row.on .name { font-weight: 700; }
+.none { padding: 28px 8px; color: var(--sub); font-size: 15px; text-align: center; }
+
+.tick { position: relative; display: block; width: 28px; height: 28px; flex: none; cursor: pointer; }
+.tick input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.box {
+  display: block;
+  width: 28px;
+  height: 28px;
+  border: 2px solid #cfcab8;
+  border-radius: 8px;
+  background: #fff;
+  position: relative;
+}
+.tick input:checked + .box { background: var(--yellow); border-color: var(--yellow-deep); }
+.tick input:checked + .box::after {
+  content: '';
+  position: absolute;
+  left: 8px; top: 3px;
+  width: 7px; height: 13px;
+  border: solid var(--ink);
+  border-width: 0 3px 3px 0;
+  transform: rotate(45deg);
+}
+.tick input:focus-visible + .box { outline: 3px solid var(--ink); outline-offset: 2px; }
+
+.qty, .nameedit {
+  font: inherit;
+  font-size: 16px;
+  color: var(--ink);
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  padding: 9px 8px;
+  background: #fff;
+  outline: none;
+}
+.qtybox { display: none; align-items: center; gap: 4px; flex: none; }
+.row.on .qtybox { display: flex; }
+.qty { width: 54px; text-align: center; flex: none; padding: 9px 4px; }
+.step {
+  width: 38px; height: 38px; padding: 0;
+  display: grid; place-items: center;
+  border: 1.5px solid var(--yellow-deep);
+  background: #fff;
+  border-radius: 10px;
+  font: inherit; font-size: 22px; font-weight: 700; line-height: 1;
+  color: var(--ink);
+  cursor: pointer;
+}
+.step:active { background: var(--yellow); }
+.step:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+.nameedit { flex: 1; min-width: 0; text-align: left; user-select: text; -webkit-user-select: text; }
+.row.on .qty { border-color: var(--yellow-deep); }
+.qty:focus, .nameedit:focus { border-color: var(--ink); }
+
+.grip {
+  flex: none;
+  width: 36px; height: 44px; padding: 0;
+  border: none; background: none;
+  font-size: 22px; line-height: 1;
+  color: var(--sub);
+  cursor: grab;
+  touch-action: none;
+  border-radius: 10px;
+}
+.grip:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+.editing .qtybox { display: none !important; }
+.editing .row.on { background: none; }
+.editing .row.on .name { font-weight: 500; }
+.editing .row { cursor: default; }
+.row.dragging {
+  position: relative;
+  z-index: 4;
+  background: #fff !important;
+  box-shadow: 0 6px 18px rgba(31, 29, 23, .18);
+  border-radius: 12px;
+  cursor: grabbing;
+}
+.del {
+  flex: none;
+  width: 40px; height: 40px;
+  border: none;
+  background: none;
+  font-size: 18px;
+  color: var(--sub);
+  cursor: pointer;
+  border-radius: 10px;
+}
+.del:active { background: var(--line); }
+
+.add { display: flex; gap: 8px; padding: 16px 0 6px; }
+.add input {
+  flex: 1; min-width: 0;
+  font: inherit; font-size: 16px;
+  border: 1.5px dashed #cfcab8;
+  border-radius: 12px;
+  padding: 13px 14px;
+  outline: none;
+  background: #fff;
+}
+.add input:focus { border-style: solid; border-color: var(--ink); }
+.btn-yellow {
+  flex: none;
+  border: none;
+  background: var(--yellow);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  font-size: 16px;
+  border-radius: 12px;
+  padding: 0 20px;
+  cursor: pointer;
+}
+.btn-yellow:active { background: var(--yellow-deep); }
+
+details.more { margin-top: 10px; font-size: 15px; }
+details.more summary { cursor: pointer; color: var(--sub); padding: 8px 2px; }
+details.more input {
+  width: 100%;
+  font: inherit; font-size: 16px;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  padding: 12px 14px;
+  outline: none;
+}
+details.more input:focus { border-color: var(--ink); }
+
+.preview-title { margin: 22px 2px 8px; font-size: 14px; color: var(--sub); }
+.preview {
+  margin: 0 0 10px;
+  padding: 14px 16px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  word-break: break-word;
+  min-height: 56px;
+  user-select: text;
+  -webkit-user-select: text;
+}
+.preview.empty { color: #b9b4a3; }
+
+.bar {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 6;
+  background: var(--bg);
+  border-top: 1px solid var(--line);
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+}
+.bar .in { max-width: 560px; margin: 0 auto; display: flex; gap: 10px; }
+.ghost {
+  flex: none;
+  border: 1.5px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  font: inherit; font-size: 15px; font-weight: 500;
+  border-radius: 14px;
+  padding: 0 16px;
+  cursor: pointer;
+}
+.ghost.armed { background: var(--ink); color: #fff; border-color: var(--ink); }
+.copy {
+  flex: 1;
+  height: 54px;
+  border: none;
+  border-radius: 14px;
+  background: var(--yellow);
+  color: var(--ink);
+  font: inherit; font-size: 19px; font-weight: 700;
+  cursor: pointer;
+}
+.copy:active { background: var(--yellow-deep); }
+.copy:focus-visible, .ghost:focus-visible, .btn-yellow:focus-visible, .link:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(86px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: #fff;
+  padding: 11px 18px;
+  border-radius: 999px;
+  font-size: 15px;
+  max-width: calc(100% - 32px);
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .15s;
+  z-index: 10;
+}
+.toast.show { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <input class="store" id="store" type="text" list="stores" placeholder="업체명 (예: 김해주촌점)" autocomplete="off" aria-label="업체명">
+    <datalist id="stores"></datalist>
+    <div class="tabs" id="tabs" role="tablist" aria-label="발주 종류"></div>
+    <div class="meta">
+      <span id="count">0개 선택</span>
+      <button class="link" id="editBtn" type="button">편집</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="panel" id="addTabPanel" hidden>
+    <input id="newTab" type="text" placeholder="새 탭 이름 (예: 정육)" enterkeyhint="done" autocomplete="off" aria-label="새 탭 이름">
+    <button class="btn-yellow" id="addTabBtn" type="button">탭 추가</button>
+  </div>
+  <div class="panel" id="editTabPanel" hidden>
+    <input id="renameTab" type="text" autocomplete="off" aria-label="탭 이름 수정">
+    <button class="ghost" id="delTabBtn" type="button">탭 삭제</button>
+  </div>
+
+  <div id="list"></div>
+
+  <div class="add">
+    <input id="newName" type="text" placeholder="품목 추가" enterkeyhint="done" autocomplete="off" aria-label="추가할 품목명">
+    <button class="btn-yellow" id="addBtn" type="button">추가</button>
+  </div>
+
+  <details class="more">
+    <summary>끝 문구 넣기</summary>
+    <input id="footer" type="text" placeholder="예: 부탁드립니다" autocomplete="off" aria-label="끝 문구">
+  </details>
+
+  <p class="preview-title">복사될 내용</p>
+  <pre class="preview empty" id="preview"></pre>
+</main>
+
+<div class="bar">
+  <div class="in">
+    <button class="ghost" id="resetBtn" type="button">초기화</button>
+    <button class="copy" id="copyBtn" type="button">복사</button>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  var KEY = 'order-app-v2';
+  var OLD_KEY = 'order-app-v1';
+
+  var D_YU = ['쌈무', '절단꽃게(젤 작은 사이즈)', '냉동새우 (대하) 50미', '판두부', '식용유', '참기름 1.8L', '초대리', '통깨', '고춧가루 1kg', '환만식초', '오징어짬뽕 1box', '소고기 다시다', '꽃소금 1kg', '순두부', '짬뽕육수', '자른당면', '겨자분말', '가마솥 누룽지', '와사비', '미트페이퍼 (젤싼거)', '쌀 20kg', '진로 토닉워터'];
+  var D_DRINK = ['물', '레쓰비', '꿀물', '코카콜라', '사이다', '환타파인', '펩시제로라임'];
+  var D_VEG = ['애호박', '팽이버섯', '새송이버섯(중)', '청양고추', '상추', '숙주', '양파', '깐마늘', '배', '당근', '대파10kg', '방울토마토 1kg'];
+  var D_ETC = ['물티슈', '점보롤', '핸드타올', '종이컵', '숯', '불판'];
+
+  var $ = function (s) { return document.querySelector(s); };
+  var listEl = $('#list'), storeEl = $('#store'), footerEl = $('#footer'), countEl = $('#count');
+  var previewEl = $('#preview'), copyBtn = $('#copyBtn'), resetBtn = $('#resetBtn'), editBtn = $('#editBtn');
+  var newName = $('#newName'), addBtn = $('#addBtn'), toastEl = $('#toast'), storesEl = $('#stores');
+  var tabsEl = $('#tabs'), addTabPanel = $('#addTabPanel'), editTabPanel = $('#editTabPanel');
+  var newTab = $('#newTab'), addTabBtn = $('#addTabBtn'), renameTab = $('#renameTab'), delTabBtn = $('#delTabBtn');
+
+  var editing = false;
+
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+  function mkItems(arr) { return arr.map(function (n) { return { id: uid(), name: n, qty: '', checked: false }; }); }
+  function mkTab(name, arr) { return { id: uid(), name: name, items: mkItems(arr) }; }
+  function defaultTabs() { return [mkTab('유통', D_YU), mkTab('음료', D_DRINK), mkTab('야채', D_VEG), mkTab('기타', D_ETC)]; }
+
+  function load() {
+    var o = null;
+    try {
+      var raw = localStorage.getItem(KEY) || localStorage.getItem(OLD_KEY);
+      if (raw) o = JSON.parse(raw);
+    } catch (e) { o = null; }
+    var S;
+    if (o && Array.isArray(o.tabs) && o.tabs.length) {
+      S = { store: o.store || '', footer: o.footer || '', stores: o.stores || [], tabs: o.tabs, active: o.active };
+    } else if (o && Array.isArray(o.items)) {
+      var tabs = [{ id: uid(), name: '유통', items: o.items }].concat(defaultTabs().slice(1));
+      S = { store: o.store || '', footer: o.footer || '', stores: o.stores || [], tabs: tabs, active: tabs[0].id };
+    } else {
+      var d = defaultTabs();
+      S = { store: '', footer: '', stores: [], tabs: d, active: d[0].id };
+    }
+    return S;
+  }
+  var S = load();
+
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+
+  function cur() {
+    var t = S.tabs.filter(function (t) { return t.id === S.active; })[0];
+    if (!t) { t = S.tabs[0]; S.active = t.id; }
+    return t;
+  }
+  function items() { return cur().items; }
+  function find(id) { return items().filter(function (i) { return i.id === id; })[0]; }
+
+  function el(tag, props) {
+    var e = document.createElement(tag);
+    if (props) for (var k in props) {
+      if (k === 'class') e.className = props[k];
+      else if (k === 'text') e.textContent = props[k];
+      else if (k in e) e[k] = props[k];
+      else e.setAttribute(k, props[k]);
+    }
+    for (var i = 2; i < arguments.length; i++) if (arguments[i]) e.appendChild(arguments[i]);
+    return e;
+  }
+
+  function buildText() {
+    var lines = items().filter(function (i) { return i.checked && i.name.trim(); })
+      .map(function (i) { return (i.name.trim() + ' ' + i.qty.trim()).trim(); });
+    var out = [];
+    if (S.store.trim()) { out.push(S.store.trim()); out.push(''); }
+    out = out.concat(lines);
+    var text = out.join('\n');
+    if (lines.length && S.footer.trim()) text += '\n\n' + S.footer.trim();
+    return text;
+  }
+
+  function countOf(list) { return list.filter(function (i) { return i.checked; }).length; }
+  function checkedCount() { return countOf(items()); }
+
+  /* ---------- tabs ---------- */
+  function renderTabs() {
+    tabsEl.innerHTML = '';
+    var activeBtn = null;
+    S.tabs.forEach(function (t) {
+      var n = countOf(t.items);
+      var b = el('button', {
+        class: 'tab', type: 'button', role: 'tab',
+        'aria-selected': t.id === S.active ? 'true' : 'false',
+        'data-tab': t.id
+      }, el('span', { text: t.name.trim() || '(이름 없음)' }), n ? el('span', { class: 'badge', text: String(n) }) : null);
+      if (t.id === S.active) activeBtn = b;
+      tabsEl.appendChild(b);
+    });
+    tabsEl.appendChild(el('button', { class: 'tab plus', type: 'button', 'data-plus': '1', 'aria-label': '탭 추가', text: '+ 탭' }));
+    if (activeBtn) {
+      var want = activeBtn.offsetLeft - (tabsEl.clientWidth - activeBtn.offsetWidth) / 2;
+      tabsEl.scrollLeft = Math.max(0, want);
+    }
+  }
+
+  tabsEl.addEventListener('click', function (e) {
+    var b = e.target.closest('.tab');
+    if (!b) return;
+    if (b.dataset.plus) {
+      addTabPanel.hidden = !addTabPanel.hidden;
+      if (!addTabPanel.hidden) { newTab.value = ''; newTab.focus(); }
+      return;
+    }
+    if (b.dataset.tab === S.active) return;
+    S.active = b.dataset.tab;
+    save();
+    render();
+    window.scrollTo(0, 0);
+  });
+
+  function addTab() {
+    var name = newTab.value.trim();
+    if (!name) { newTab.focus(); return; }
+    var t = { id: uid(), name: name, items: [] };
+    S.tabs.push(t);
+    S.active = t.id;
+    addTabPanel.hidden = true;
+    newTab.value = '';
+    save();
+    render();
+    window.scrollTo(0, 0);
+    newName.focus();
+    toast('“' + name + '” 탭을 만들었어요. 아래에서 품목을 추가하세요');
+  }
+  addTabBtn.addEventListener('click', addTab);
+  newTab.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); addTab(); } });
+
+  renameTab.addEventListener('input', function () {
+    cur().name = renameTab.value;
+    renderTabs();
+    save();
+  });
+  renameTab.addEventListener('keydown', function (e) { if (e.key === 'Enter') renameTab.blur(); });
+
+  var delArmed = false, delTimer;
+  function disarmDel() { delArmed = false; delTabBtn.textContent = '탭 삭제'; delTabBtn.classList.remove('armed'); clearTimeout(delTimer); }
+  delTabBtn.addEventListener('click', function () {
+    if (S.tabs.length <= 1) { toast('마지막 탭은 지울 수 없어요'); return; }
+    if (!delArmed) {
+      delArmed = true;
+      delTabBtn.textContent = '한 번 더';
+      delTabBtn.classList.add('armed');
+      delTimer = setTimeout(disarmDel, 3000);
+      return;
+    }
+    disarmDel();
+    var idx = S.tabs.indexOf(cur());
+    S.tabs.splice(idx, 1);
+    S.active = S.tabs[Math.max(0, idx - 1)].id;
+    save();
+    render();
+    toast('탭을 삭제했어요');
+  });
+
+  /* ---------- list ---------- */
+  function update() {
+    var n = checkedCount();
+    countEl.textContent = n + '개 선택';
+    copyBtn.textContent = n ? '복사 (' + n + ')' : '복사';
+    if (n) { previewEl.textContent = buildText(); previewEl.classList.remove('empty'); }
+    else { previewEl.textContent = '체크한 품목이 여기에 표시돼요'; previewEl.classList.add('empty'); }
+    renderTabs();
+  }
+
+  function renderStores() {
+    storesEl.innerHTML = '';
+    S.stores.forEach(function (s) { storesEl.appendChild(el('option', { value: s })); });
+  }
+
+  function row(it) {
+    var cb = el('input', { type: 'checkbox', checked: it.checked, 'aria-label': it.name });
+    var tick = el('label', { class: 'tick' }, cb, el('span', { class: 'box' }));
+    var nameEl = editing
+      ? el('input', { class: 'nameedit', type: 'text', value: it.name, 'aria-label': '품목명' })
+      : el('span', { class: 'name', text: it.name });
+    var qty = el('input', { class: 'qty', type: 'text', value: it.qty, placeholder: '수량', enterkeyhint: 'done', autocomplete: 'off', 'aria-label': it.name + ' 수량' });
+    var minus = el('button', { class: 'step', type: 'button', 'data-d': '-1', 'aria-label': it.name + ' 수량 줄이기', text: '−' });
+    var plus = el('button', { class: 'step', type: 'button', 'data-d': '1', 'aria-label': it.name + ' 수량 늘리기', text: '+' });
+    var qbox = el('div', { class: 'qtybox' }, minus, qty, plus);
+    var del = editing ? el('button', { class: 'del', type: 'button', 'aria-label': it.name + ' 삭제', text: '✕' }) : null;
+    var lead = editing
+      ? el('button', { class: 'grip', type: 'button', 'aria-label': it.name + ' 순서 이동 (끌거나 위아래 방향키)', text: '☰' })
+      : tick;
+    return el('div', { class: 'row' + (it.checked ? ' on' : ''), 'data-id': it.id }, lead, nameEl, qbox, del);
+  }
+
+  function render() {
+    disarmDel();
+    listEl.innerHTML = '';
+    listEl.classList.toggle('editing', editing);
+    var list = items();
+    if (!list.length) listEl.appendChild(el('p', { class: 'none', text: '품목이 없어요. 아래에서 추가하세요.' }));
+    list.forEach(function (it) { listEl.appendChild(row(it)); });
+    editBtn.textContent = editing ? '완료' : '편집';
+    editTabPanel.hidden = !editing;
+    if (editing) renameTab.value = cur().name;
+    update();
+  }
+
+  function syncRow(r, it) {
+    r.classList.toggle('on', it.checked);
+    r.querySelector('.tick input').checked = it.checked;
+    r.querySelector('.qty').value = it.qty;
+  }
+
+  function step(it, d) {
+    var m = /^\s*(\d+(?:\.\d+)?)(.*)$/.exec(it.qty || '');
+    var n = m ? parseFloat(m[1]) : 0;
+    var rest = m ? m[2] : (it.qty || '');
+    n = Math.round((n + d) * 100) / 100;
+    if (n <= 0) { it.checked = false; it.qty = ''; }
+    else { it.checked = true; it.qty = String(n) + rest; }
+  }
+
+  listEl.addEventListener('change', function (e) {
+    if (!e.target.matches('.tick input')) return;
+    var r = e.target.closest('.row'), it = find(r.dataset.id);
+    it.checked = e.target.checked;
+    if (it.checked) { if (!it.qty.trim()) it.qty = '1'; }
+    else it.qty = '';
+    syncRow(r, it);
+    update(); save();
+  });
+
+  listEl.addEventListener('input', function (e) {
+    var r = e.target.closest('.row');
+    if (!r) return;
+    var it = find(r.dataset.id);
+    if (e.target.classList.contains('qty')) {
+      it.qty = e.target.value;
+    } else if (e.target.classList.contains('nameedit')) {
+      it.name = e.target.value;
+    } else return;
+    update(); save();
+  });
+
+  listEl.addEventListener('click', function (e) {
+    var r = e.target.closest('.row');
+    if (!r) return;
+    if (e.target.closest('.del')) {
+      cur().items = items().filter(function (i) { return i.id !== r.dataset.id; });
+      render(); save();
+      return;
+    }
+    var st = e.target.closest('.step');
+    if (st) {
+      var it2 = find(r.dataset.id);
+      step(it2, parseInt(st.dataset.d, 10));
+      syncRow(r, it2);
+      update(); save();
+      return;
+    }
+    if (e.target.closest('input, button, label')) return;
+    if (editing) return;
+    r.querySelector('.tick input').click();
+  });
+
+  listEl.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && e.target.matches('.qty, .nameedit')) e.target.blur();
+  });
+
+  /* ---------- reorder (edit mode) ---------- */
+  function commitOrder() {
+    var rows = Array.prototype.filter.call(listEl.children, function (r) { return r.dataset && r.dataset.id; });
+    cur().items = rows.map(function (r) { return find(r.dataset.id); });
+    save();
+  }
+
+  var drag = null, dragTimer = null;
+
+  function applyDrag() {
+    var r = drag.row;
+    var dy = drag.lastY - drag.startY + (window.scrollY - drag.scrollStart);
+    r.style.transform = 'translateY(' + dy + 'px)';
+    var rect = r.getBoundingClientRect(), mid = rect.top + rect.height / 2;
+    var prev = r.previousElementSibling, next = r.nextElementSibling;
+    if (prev) {
+      var p = prev.getBoundingClientRect();
+      if (mid < p.top + p.height / 2) {
+        listEl.insertBefore(r, prev);
+        drag.startY -= p.height;
+        r.style.transform = 'translateY(' + (dy + p.height) + 'px)';
+        return;
+      }
+    }
+    if (next) {
+      var n = next.getBoundingClientRect();
+      if (mid > n.top + n.height / 2) {
+        listEl.insertBefore(next, r);
+        drag.startY += n.height;
+        r.style.transform = 'translateY(' + (dy - n.height) + 'px)';
+      }
+    }
+  }
+
+  listEl.addEventListener('pointerdown', function (e) {
+    var g = e.target.closest('.grip');
+    if (!g || drag) return;
+    e.preventDefault();
+    try { listEl.setPointerCapture(e.pointerId); } catch (x) {}
+    drag = { row: g.closest('.row'), pid: e.pointerId, startY: e.clientY, lastY: e.clientY, scrollStart: window.scrollY };
+    drag.row.classList.add('dragging');
+    dragTimer = setInterval(function () {
+      if (!drag) return;
+      var sp = 0;
+      if (drag.lastY < 200) sp = -10;
+      else if (drag.lastY > window.innerHeight - 150) sp = 10;
+      if (sp) { window.scrollBy(0, sp); applyDrag(); }
+    }, 16);
+  });
+
+  listEl.addEventListener('pointermove', function (e) {
+    if (!drag || e.pointerId !== drag.pid) return;
+    drag.lastY = e.clientY;
+    applyDrag();
+  });
+
+  function endDrag(e) {
+    if (!drag || e.pointerId !== drag.pid) return;
+    clearInterval(dragTimer);
+    drag.row.style.transform = '';
+    drag.row.classList.remove('dragging');
+    try { listEl.releasePointerCapture(drag.pid); } catch (x) {}
+    drag = null;
+    commitOrder();
+  }
+  listEl.addEventListener('pointerup', endDrag);
+  listEl.addEventListener('pointercancel', endDrag);
+
+  listEl.addEventListener('keydown', function (e) {
+    var g = e.target.closest && e.target.closest('.grip');
+    if (!g || (e.key !== 'ArrowUp' && e.key !== 'ArrowDown')) return;
+    e.preventDefault();
+    var r = g.closest('.row');
+    var sib = e.key === 'ArrowUp' ? r.previousElementSibling : r.nextElementSibling;
+    if (!sib) return;
+    if (e.key === 'ArrowUp') listEl.insertBefore(r, sib); else listEl.insertBefore(sib, r);
+    commitOrder();
+    g.focus();
+  });
+
+  /* ---------- add item ---------- */
+  function addItem() {
+    var name = newName.value.trim();
+    if (!name) { newName.focus(); return; }
+    var it = { id: uid(), name: name, qty: '1', checked: true };
+    items().push(it);
+    newName.value = '';
+    render(); save();
+    var q = listEl.querySelector('[data-id="' + it.id + '"]');
+    if (q) q.scrollIntoView({ block: 'center' });
+    newName.focus();
+  }
+  addBtn.addEventListener('click', addItem);
+  newName.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); addItem(); } });
+
+  editBtn.addEventListener('click', function () { editing = !editing; render(); });
+
+  storeEl.addEventListener('input', function () { S.store = storeEl.value; update(); save(); });
+  footerEl.addEventListener('input', function () { S.footer = footerEl.value; update(); save(); });
+
+  /* ---------- toast / copy ---------- */
+  var toastTimer;
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 2400);
+  }
+
+  function copyText(text) {
+    return new Promise(function (resolve) {
+      function fallback() {
+        try {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.setAttribute('readonly', '');
+          ta.style.position = 'fixed';
+          ta.style.top = '0';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.focus();
+          ta.select();
+          ta.setSelectionRange(0, text.length);
+          var ok = document.execCommand('copy');
+          document.body.removeChild(ta);
+          resolve(!!ok);
+        } catch (e) { resolve(false); }
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { resolve(true); }, fallback);
+      } else fallback();
+    });
+  }
+
+  function selectPreview() {
+    try {
+      var range = document.createRange();
+      range.selectNodeContents(previewEl);
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    } catch (e) {}
+  }
+
+  copyBtn.addEventListener('click', function () {
+    if (!checkedCount()) { toast('체크한 품목이 없어요'); return; }
+    var text = buildText();
+    copyText(text).then(function (ok) {
+      if (ok) {
+        var s = S.store.trim();
+        if (s && S.stores.indexOf(s) === -1) { S.stores.unshift(s); S.stores = S.stores.slice(0, 10); renderStores(); save(); }
+        toast('복사됐어요. 카톡에 붙여넣기 하세요');
+      } else {
+        selectPreview();
+        toast('복사가 막혔어요. 아래 내용을 길게 눌러 복사하세요');
+      }
+    });
+  });
+
+  /* ---------- reset (current tab) ---------- */
+  var armed = false, armTimer;
+  function disarm() { armed = false; resetBtn.textContent = '초기화'; resetBtn.classList.remove('armed'); clearTimeout(armTimer); }
+  resetBtn.addEventListener('click', function () {
+    if (!armed) {
+      armed = true;
+      resetBtn.textContent = '한 번 더';
+      resetBtn.classList.add('armed');
+      armTimer = setTimeout(disarm, 3000);
+      return;
+    }
+    disarm();
+    items().forEach(function (i) { i.checked = false; i.qty = ''; });
+    render(); save();
+    toast('이 탭의 체크와 수량을 비웠어요');
+  });
+
+  storeEl.value = S.store;
+  footerEl.value = S.footer;
+  renderStores();
+  render();
+})();
+</script>
+</body>
+</html>
